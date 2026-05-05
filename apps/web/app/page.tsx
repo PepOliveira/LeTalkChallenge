@@ -15,7 +15,7 @@ export default function Home() {
             </span>
           </div>
           <span className="text-xs text-muted-foreground">
-            Enriquecimento via CNPJ
+            Enriquecimento de Dados Cadastrais
           </span>
         </div>
       </header>
