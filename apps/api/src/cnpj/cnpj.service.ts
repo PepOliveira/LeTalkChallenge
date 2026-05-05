@@ -8,7 +8,7 @@ import { BrasilApiCnpjResponse, EnrichedCompany } from './cnpj.types';
 export class CnpjService {
   private readonly brasilApiUrl = 'https://brasilapi.com.br/api/cnpj/v1';
 
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) { }
 
   private sanitizeCnpj(cnpj: string): string {
     return cnpj.replace(/\D/g, '');
