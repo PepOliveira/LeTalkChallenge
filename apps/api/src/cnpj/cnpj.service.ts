@@ -1,10 +1,14 @@
-import { Injectable, BadRequestException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, InternalServerErrorException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import axios from 'axios';
 import { BrasilApiCnpjResponse, EnrichedCompany } from './cnpj.types';
 
 @Injectable()
 export class CnpjService {
   private readonly brasilApiUrl = 'https://brasilapi.com.br/api/cnpj/v1';
+
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   private sanitizeCnpj(cnpj: string): string {
     return cnpj.replace(/\D/g, '');
@@ -21,21 +25,13 @@ export class CnpjService {
         sum += parseInt(cnpj.charAt(length - i)) * pos--;
         if (pos < 2) pos = 9;
       }
-      const result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-      return result;
+      return sum % 11 < 2 ? 0 : 11 - (sum % 11);
     };
 
-    const d1 = calcDigit(cnpj, 12);
-    if (d1 !== parseInt(cnpj.charAt(12))) return false;
-
-    const d2 = calcDigit(cnpj, 13);
-    if (d2 !== parseInt(cnpj.charAt(13))) return false;
+    if (calcDigit(cnpj, 12) !== parseInt(cnpj.charAt(12))) return false;
+    if (calcDigit(cnpj, 13) !== parseInt(cnpj.charAt(13))) return false;
 
     return true;
-  }
-
-  private formatCapitalSocial(value: number): number {
-    return value;
   }
 
   private mapToEnriched(data: BrasilApiCnpjResponse): EnrichedCompany {
@@ -48,7 +44,7 @@ export class CnpjService {
         descricao: data.cnae_fiscal_descricao,
       },
       porte: data.porte,
-      capital_social: this.formatCapitalSocial(data.capital_social),
+      capital_social: data.capital_social,
       localizacao: {
         municipio: data.municipio,
         uf: data.uf,
@@ -71,11 +67,20 @@ export class CnpjService {
       throw new BadRequestException('CNPJ inválido.');
     }
 
+    const cacheKey = `cnpj:${sanitized}`;
+    const cached = await this.cacheManager.get<EnrichedCompany>(cacheKey);
+
+    if (cached) return cached;
+
     try {
       const { data } = await axios.get<BrasilApiCnpjResponse>(
         `${this.brasilApiUrl}/${sanitized}`,
       );
-      return this.mapToEnriched(data);
+
+      const enriched = this.mapToEnriched(data);
+      await this.cacheManager.set(cacheKey, enriched);
+
+      return enriched;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
