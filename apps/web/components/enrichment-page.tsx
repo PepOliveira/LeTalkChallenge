@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LeadForm } from "@/components/lead-form";
 import { CompanyResult } from "@/components/company-result";
-import { fetchCompanyByCnpj } from "@/lib/api";
+import { enrichLead } from "@/lib/api";
 import { EnrichedCompany, Lead, SearchStatus } from "@/lib/types";
 
 export function EnrichmentPage() {
@@ -18,8 +18,8 @@ export function EnrichmentPage() {
     setCompany(null);
 
     try {
-      const data = await fetchCompanyByCnpj(lead.cnpj);
-      setCompany(data);
+      const data = await enrichLead(lead);
+      setCompany(data.empresa);
       setStatus("success");
     } catch (err) {
       const message =

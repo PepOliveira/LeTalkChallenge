@@ -1,13 +1,13 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { CnpjService } from './cnpj.service';
-import { EnrichedCompany } from './cnpj.types';
+import { CreateLeadDto, LeadResponse } from './cnpj.types';
 
-@Controller('cnpj')
+@Controller('leads')
 export class CnpjController {
   constructor(private readonly cnpjService: CnpjService) {}
 
-  @Get(':cnpj')
-  async findByCnpj(@Param('cnpj') cnpj: string): Promise<EnrichedCompany> {
-    return this.cnpjService.findByCnpj(cnpj);
+  @Post()
+  async enrichLead(@Body() body: CreateLeadDto): Promise<LeadResponse> {
+    return this.cnpjService.enrichLead(body);
   }
 }

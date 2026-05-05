@@ -1,11 +1,12 @@
-import { EnrichedCompany } from "./types";
+import { Lead, LeadResponse } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function fetchCompanyByCnpj(cnpj: string): Promise<EnrichedCompany> {
-  const sanitized = cnpj.replace(/\D/g, "");
-
-  const response = await fetch(`${API_URL}/cnpj/${sanitized}`, {
+export async function enrichLead(lead: Lead): Promise<LeadResponse> {
+  const response = await fetch(`${API_URL}/leads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(lead),
     cache: "no-store",
   });
 

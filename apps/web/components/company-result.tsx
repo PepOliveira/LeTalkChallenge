@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, MapPin, Phone, Users, AlertCircle, Tag } from "lucide-react";
+import { Building2, MapPin, Phone, Users, AlertCircle, Tag, Briefcase } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -17,20 +17,20 @@ function StatusBadge({ status }: { status: string }) {
   const normalized = status?.toUpperCase();
   if (normalized === "ATIVA") {
     return (
-      <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200">
+      <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 shrink-0">
         {status}
       </Badge>
     );
   }
   if (normalized === "BAIXADA" || normalized === "INAPTA") {
     return (
-      <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200">
+      <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border border-red-200 shrink-0">
         {status}
       </Badge>
     );
   }
   return (
-    <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200">
+    <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border border-amber-200 shrink-0">
       {status}
     </Badge>
   );
@@ -45,6 +45,18 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <span className="text-sm text-foreground">{value || "—"}</span>
     </div>
   );
+}
+
+function formatAddress(endereco: EnrichedCompany["endereco"]): string {
+  const parts = [
+    endereco.logradouro,
+    endereco.numero,
+    endereco.complemento,
+    endereco.bairro,
+  ].filter(Boolean);
+  const linha1 = parts.join(", ");
+  const linha2 = `${endereco.municipio} - ${endereco.uf}${endereco.cep ? `, CEP ${endereco.cep}` : ""}`;
+  return linha1 ? `${linha1}\n${linha2}` : linha2;
 }
 
 function EmptyState() {
@@ -100,6 +112,8 @@ function LoadingState() {
 }
 
 function CompanyData({ company }: { company: EnrichedCompany }) {
+  const address = formatAddress(company.endereco);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -119,11 +133,14 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
           <Tag className="h-4 w-4" />
           Segmento
         </div>
-        <div className="rounded-lg border bg-muted/40 p-3 flex flex-col gap-0.5">
-          <span className="text-xs text-muted-foreground font-mono">
-            CNAE {company.cnae.codigo}
-          </span>
-          <span className="text-sm font-medium">{company.cnae.descricao}</span>
+        <div className="rounded-lg border bg-muted/40 p-3 flex flex-col gap-1">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-medium">{company.segmento}</span>
+            <span className="text-xs text-muted-foreground font-mono">
+              CNAE {company.cnae.codigo}
+            </span>
+          </div>
+          <span className="text-xs text-muted-foreground">{company.cnae.descricao}</span>
         </div>
       </div>
 
@@ -131,15 +148,13 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Building2 className="h-4 w-4" />
+          <Briefcase className="h-4 w-4" />
           Perfil da empresa
         </div>
         <div className="grid grid-cols-2 gap-4">
           <InfoRow label="Porte" value={company.porte} />
-          <InfoRow
-            label="Capital social"
-            value={formatCapital(company.capital_social)}
-          />
+          <InfoRow label="Faixa de funcionários" value={company.faixa_funcionarios} />
+          <InfoRow label="Capital social" value={formatCapital(company.capital_social)} />
         </div>
       </div>
 
@@ -148,12 +163,9 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <MapPin className="h-4 w-4" />
-          Localização
+          Endereço
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <InfoRow label="Município" value={company.localizacao.municipio} />
-          <InfoRow label="UF" value={company.localizacao.uf} />
-        </div>
+        <p className="text-sm text-foreground whitespace-pre-line">{address}</p>
       </div>
 
       {(company.contato.telefone || company.contato.email) && (

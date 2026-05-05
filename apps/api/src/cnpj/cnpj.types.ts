@@ -7,8 +7,13 @@ export interface BrasilApiCnpjResponse {
   cnae_fiscal_descricao: string;
   porte: string;
   capital_social: number;
+  logradouro: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
   municipio: string;
   uf: string;
+  cep: string;
   ddd_telefone_1: string;
   email: string;
   cnaes_secundarios: Array<{
@@ -25,15 +30,22 @@ export interface EnrichedCompany {
   razao_social: string;
   nome_fantasia: string;
   situacao_cadastral: string;
+  segmento: string;
   cnae: {
     codigo: number;
     descricao: string;
   };
   porte: string;
+  faixa_funcionarios: string;
   capital_social: number;
-  localizacao: {
+  endereco: {
+    logradouro: string;
+    numero: string;
+    complemento: string;
+    bairro: string;
     municipio: string;
     uf: string;
+    cep: string;
   };
   contato: {
     telefone: string;
@@ -45,12 +57,14 @@ export interface EnrichedCompany {
   }>;
 }
 
-export interface LeadWithCompany {
-  lead: {
-    nome: string;
-    email: string;
-    telefone: string;
-    cnpj: string;
-  };
+export class CreateLeadDto {
+  nome: string;
+  email: string;
+  telefone: string;
+  cnpj: string;
+}
+
+export interface LeadResponse {
+  lead: CreateLeadDto;
   empresa: EnrichedCompany;
 }
