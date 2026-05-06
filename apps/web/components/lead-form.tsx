@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Search, CheckCircle2 } from "lucide-react";
+import { Loader2, Search, CircleCheck, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,9 +41,11 @@ function FieldWrapper({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
-        <Label htmlFor={htmlFor}>{label}</Label>
+        <Label htmlFor={htmlFor} className="text-[#374151] font-medium text-sm">
+          {label}
+        </Label>
         {valid && !error && (
-          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+          <CircleCheck className="h-3.5 w-3.5 text-primary" />
         )}
       </div>
       {children}
@@ -70,6 +72,7 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
   };
 
   const allValid = Object.values(fieldValid).every(Boolean);
+  const cnpjTyping = form.cnpj.length > 0;
 
   function handleCnpjChange(e: React.ChangeEvent<HTMLInputElement>) {
     const formatted = formatCnpj(e.target.value);
@@ -109,12 +112,7 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
-      <FieldWrapper
-        label="Nome completo"
-        htmlFor="nome"
-        error={errors.nome}
-        valid={fieldValid.nome}
-      >
+      <FieldWrapper label="Nome completo" htmlFor="nome" error={errors.nome} valid={fieldValid.nome}>
         <Input
           id="nome"
           placeholder="ex: João Silva"
@@ -122,16 +120,11 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
           onChange={handleChange("nome")}
           disabled={isLoading}
           aria-invalid={!!errors.nome}
-          className={cn(fieldValid.nome && !errors.nome && "border-emerald-400/60 focus-visible:ring-emerald-400/30")}
+          className={cn(fieldValid.nome && !errors.nome && "border-primary/40")}
         />
       </FieldWrapper>
 
-      <FieldWrapper
-        label="E-mail"
-        htmlFor="email"
-        error={errors.email}
-        valid={fieldValid.email}
-      >
+      <FieldWrapper label="E-mail" htmlFor="email" error={errors.email} valid={fieldValid.email}>
         <Input
           id="email"
           type="email"
@@ -140,16 +133,11 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
           onChange={handleChange("email")}
           disabled={isLoading}
           aria-invalid={!!errors.email}
-          className={cn(fieldValid.email && !errors.email && "border-emerald-400/60 focus-visible:ring-emerald-400/30")}
+          className={cn(fieldValid.email && !errors.email && "border-primary/40")}
         />
       </FieldWrapper>
 
-      <FieldWrapper
-        label="Telefone"
-        htmlFor="telefone"
-        error={errors.telefone}
-        valid={fieldValid.telefone}
-      >
+      <FieldWrapper label="Telefone" htmlFor="telefone" error={errors.telefone} valid={fieldValid.telefone}>
         <Input
           id="telefone"
           type="tel"
@@ -158,32 +146,53 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
           onChange={handleChange("telefone")}
           disabled={isLoading}
           aria-invalid={!!errors.telefone}
-          className={cn(fieldValid.telefone && !errors.telefone && "border-emerald-400/60 focus-visible:ring-emerald-400/30")}
+          className={cn(fieldValid.telefone && !errors.telefone && "border-primary/40")}
         />
       </FieldWrapper>
 
-      <FieldWrapper
-        label="CNPJ"
-        htmlFor="cnpj"
-        error={errors.cnpj}
-        valid={fieldValid.cnpj}
-      >
-        <Input
-          id="cnpj"
-          placeholder="00.000.000/0000-00"
-          value={form.cnpj}
-          onChange={handleCnpjChange}
-          disabled={isLoading}
-          aria-invalid={!!errors.cnpj}
-          className={cn(fieldValid.cnpj && !errors.cnpj && "border-emerald-400/60 focus-visible:ring-emerald-400/30")}
-        />
-      </FieldWrapper>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="cnpj" className="text-[#374151] font-medium text-sm">
+            CNPJ
+          </Label>
+          {cnpjTyping && fieldValid.cnpj && (
+            <CircleCheck className="h-3.5 w-3.5 text-primary" />
+          )}
+        </div>
+        <div className="relative">
+          <Input
+            id="cnpj"
+            placeholder="00.000.000/0000-00"
+            value={form.cnpj}
+            onChange={handleCnpjChange}
+            disabled={isLoading}
+            aria-invalid={!!errors.cnpj}
+            className={cn(
+              "pr-9",
+              fieldValid.cnpj && !errors.cnpj && "border-primary/40",
+            )}
+          />
+          {cnpjTyping && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              {fieldValid.cnpj ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              ) : (
+                <XCircle className="h-4 w-4 text-[#9CA3AF]" />
+              )}
+            </div>
+          )}
+        </div>
+        {errors.cnpj && <p className="text-xs text-destructive">{errors.cnpj}</p>}
+        {cnpjTyping && fieldValid.cnpj && !errors.cnpj && (
+          <p className="text-xs text-emerald-600">CNPJ válido</p>
+        )}
+      </div>
 
       <div className="flex flex-col gap-2 mt-1">
         {allValid && (
-          <div className="flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-            <span className="text-xs text-emerald-700 font-medium">
+          <div className="flex items-center gap-2 rounded-lg bg-primary/8 border border-primary/20 px-3 py-2">
+            <CircleCheck className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-xs text-primary font-medium">
               Tudo certo — pronto para buscar.
             </span>
           </div>
@@ -192,7 +201,7 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full gap-2"
+          className="w-full h-10 gap-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
         >
           {isLoading ? (
             <>

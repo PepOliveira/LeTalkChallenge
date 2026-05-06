@@ -17,21 +17,21 @@ function statusConfig(status: string) {
   const normalized = status?.toUpperCase();
   if (normalized === "ATIVA") {
     return {
-      dot: "bg-emerald-500",
-      band: "bg-emerald-50 border-emerald-200",
-      text: "text-emerald-700",
+      dot: "bg-teal-500/70",
+      band: "bg-teal-50/60 border-teal-200/50",
+      text: "text-teal-700",
     };
   }
   if (normalized === "BAIXADA" || normalized === "INAPTA") {
     return {
-      dot: "bg-red-500",
-      band: "bg-red-50 border-red-200",
-      text: "text-red-700",
+      dot: "bg-rose-400/70",
+      band: "bg-rose-50/60 border-rose-200/50",
+      text: "text-rose-700",
     };
   }
   return {
-    dot: "bg-amber-500",
-    band: "bg-amber-50 border-amber-200",
+    dot: "bg-amber-400/70",
+    band: "bg-amber-50/60 border-amber-200/50",
     text: "text-amber-700",
   };
 }
@@ -57,7 +57,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl bg-muted/40 border border-border/50 p-4 flex flex-col gap-3">
+    <div className="rounded-lg bg-white/70 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-200 p-4 flex flex-col gap-3">
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 text-primary" />
         <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
@@ -78,15 +78,17 @@ function formatAddress(endereco: EnrichedCompany["endereco"]): string {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[420px] gap-4 text-center px-6">
-      <div className="rounded-2xl bg-muted/60 p-5">
-        <Building2 className="h-9 w-9 text-muted-foreground/60" />
+    <div className="flex flex-col items-center justify-center min-h-[420px] gap-5 text-center px-6">
+      <div className="rounded-full bg-primary/10 p-5">
+        <Building2 className="h-8 w-8 text-primary" />
       </div>
-      <div className="flex flex-col gap-1.5 max-w-xs">
-        <p className="font-semibold text-foreground">Nenhuma empresa consultada</p>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Preencha o formulário ao lado e clique em{" "}
-          <strong className="text-foreground">Buscar empresa</strong> para visualizar os dados.
+      <div className="flex flex-col gap-2 max-w-xs">
+        <p className="text-base font-semibold text-[#111827]">
+          Consulte os dados de uma empresa
+        </p>
+        <p className="text-sm text-[#6B7280] leading-relaxed">
+          Preencha o formulário ao lado com nome, e-mail, telefone e CNPJ do lead e clique em{" "}
+          <strong className="text-[#374151]">Buscar empresa</strong>.
         </p>
       </div>
     </div>
@@ -172,7 +174,7 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
       </Section>
 
       <Section icon={Briefcase} title="Perfil">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <InfoRow label="Porte" value={company.porte} />
           <InfoRow label="Funcionários" value={company.faixa_funcionarios} />
           <InfoRow label="Capital social" value={formatCapital(company.capital_social)} />
@@ -204,7 +206,7 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
             {company.socios.map((socio, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between rounded-lg bg-background/60 border border-border/50 px-3 py-2.5"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-0 rounded-lg bg-background/60 border border-border/50 px-3 py-2.5"
               >
                 <span className="text-sm font-medium">{socio.nome}</span>
                 <span className="text-xs text-muted-foreground">{socio.qualificacao}</span>
@@ -220,12 +222,12 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
 export function CompanyResult({ status, company, error }: CompanyResultProps) {
   return (
     <div className="glass rounded-2xl shadow-xl shadow-blue-900/8 h-full">
-      <CardHeader className="pb-4">
+      <CardHeader className="pt-6 pb-4">
         <CardTitle className="text-base font-semibold text-foreground">
           Dados da empresa
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pb-6">
         {status === "idle" && <EmptyState />}
         {status === "loading" && <LoadingState />}
         {status === "error" && <ErrorState message={error!} />}
