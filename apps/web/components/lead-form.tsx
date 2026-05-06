@@ -219,7 +219,7 @@ export function LeadForm({ onSubmit, isLoading, initialValues }: LeadFormProps) 
           <div className="flex items-center gap-2 rounded-lg bg-primary/8 border border-primary/20 px-3 py-2">
             <CircleCheck className="h-4 w-4 text-primary shrink-0" />
             <span className="text-xs text-primary font-medium">
-              Tudo certo — pronto para buscar.
+              Dados validados. Clique abaixo para consultar o CNPJ.
             </span>
           </div>
         )}
