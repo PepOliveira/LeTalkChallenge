@@ -1,33 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LeadForm } from "@/components/lead-form";
 import { CompanyResult } from "@/components/company-result";
 import { enrichLead } from "@/lib/api";
-import { EnrichedCompany, Lead, SearchStatus } from "@/lib/types";
+import { Lead, LeadResponse } from "@/lib/types";
 
 export function EnrichmentPage() {
-  const [status, setStatus] = useState<SearchStatus>("idle");
-  const [company, setCompany] = useState<EnrichedCompany | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  async function handleSearch(lead: Lead) {
-    setStatus("loading");
-    setError(null);
-    setCompany(null);
+  const mutation = useMutation<LeadResponse, Error, Lead>({
+    mutationFn: enrichLead,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["cnpj", data.empresa.cnae.codigo, data.lead.cnpj], data);
+    },
+  });
 
-    try {
-      const data = await enrichLead(lead);
-      setCompany(data.empresa);
-      setStatus("success");
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Erro inesperado. Tente novamente.";
-      setError(message);
-      setStatus("error");
-    }
-  }
+  const status = mutation.isPending
+    ? "loading"
+    : mutation.isSuccess
+      ? "success"
+      : mutation.isError
+        ? "error"
+        : "idle";
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] xl:grid-cols-[400px_1fr] gap-4 sm:gap-6 items-start">
@@ -40,12 +36,16 @@ export function EnrichmentPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-6">
-            <LeadForm onSubmit={handleSearch} isLoading={status === "loading"} />
+            <LeadForm onSubmit={mutation.mutate} isLoading={mutation.isPending} />
           </CardContent>
         </div>
       </div>
 
-      <CompanyResult status={status} company={company} error={error} />
+      <CompanyResult
+        status={status}
+        company={mutation.data?.empresa ?? null}
+        error={mutation.error?.message ?? null}
+      />
     </div>
   );
 }
