@@ -9,6 +9,7 @@ export interface EnrichedCompany {
   razao_social: string;
   nome_fantasia: string;
   situacao_cadastral: string;
+  data_inicio_atividade: string;
   segmento: string;
   cnae: {
     codigo: number;

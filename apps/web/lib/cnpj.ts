@@ -14,6 +14,15 @@ export function formatCapital(value: number): string {
   }).format(value);
 }
 
+export function formatDate(value: string): string {
+  if (!value) return "";
+  const date = new Date(value + "T12:00:00");
+  return new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 export function formatPhone(value: string): string {
   if (!value) return "";
   const digits = value.replace(/\D/g, "");

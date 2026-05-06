@@ -40,6 +40,7 @@ export class CnpjService {
       razao_social: data.razao_social,
       nome_fantasia: data.nome_fantasia || data.razao_social,
       situacao_cadastral: data.descricao_situacao_cadastral,
+      data_inicio_atividade: data.data_inicio_atividade || '',
       segmento: mapCnaeToSegment(data.cnae_fiscal),
       cnae: {
         codigo: data.cnae_fiscal,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LeadForm } from "@/components/lead-form";
 import { CompanyResult } from "@/components/company-result";
 import { enrichLead } from "@/lib/api";
@@ -31,8 +31,8 @@ export function EnrichmentPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
-      <div className="lg:sticky lg:top-6">
-        <Card>
+      <div className="lg:sticky lg:top-[76px]">
+        <div className="glass rounded-2xl shadow-xl shadow-blue-900/8">
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-semibold">Dados do lead</CardTitle>
             <CardDescription>
@@ -42,7 +42,7 @@ export function EnrichmentPage() {
           <CardContent>
             <LeadForm onSubmit={handleSearch} isLoading={status === "loading"} />
           </CardContent>
-        </Card>
+        </div>
       </div>
 
       <CompanyResult status={status} company={company} error={error} />

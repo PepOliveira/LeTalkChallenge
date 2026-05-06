@@ -14,6 +14,7 @@ export interface BrasilApiCnpjResponse {
   municipio: string;
   uf: string;
   cep: string;
+  data_inicio_atividade: string;
   ddd_telefone_1: string;
   email: string;
   cnaes_secundarios: Array<{
@@ -30,6 +31,7 @@ export interface EnrichedCompany {
   razao_social: string;
   nome_fantasia: string;
   situacao_cadastral: string;
+  data_inicio_atividade: string;
   segmento: string;
   cnae: {
     codigo: number;
