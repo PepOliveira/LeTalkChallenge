@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { EnrichmentPage } from "@/components/enrichment-page";
+import { StickyHeader } from "@/components/sticky-header";
 
 export default function Home() {
   return (
@@ -27,27 +27,7 @@ export default function Home() {
         />
       </div>
 
-      <header className="glass-header sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto pl-3 sm:pl-4 pr-4 sm:pr-8 py-4 sm:py-5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Image
-              src="/logo-letalk.png"
-              alt="LeTalk"
-              width={110}
-              height={34}
-              className="shrink-0 w-[80px] sm:w-[110px] h-auto"
-              priority
-            />
-            <div className="hidden sm:block h-6 w-px bg-[#D1D5DB]" />
-            <span className="hidden sm:block text-sm text-muted-foreground">
-              Identificação de Leads
-            </span>
-          </div>
-          <span className="text-xs text-muted-foreground hidden sm:block">
-            Enriquecimento de Dados Cadastrais
-          </span>
-        </div>
-      </header>
+      <StickyHeader />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-10">
         <div className="mb-8">
