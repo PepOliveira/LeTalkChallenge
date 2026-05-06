@@ -88,6 +88,7 @@ export class CreateLeadDto {
   nome: string;
   email: string;
   telefone: string;
+  cargo: string;
   cnpj: string;
 }
 

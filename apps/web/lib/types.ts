@@ -2,6 +2,7 @@ export interface Lead {
   nome: string;
   email: string;
   telefone: string;
+  cargo: string;
   cnpj: string;
 }
 

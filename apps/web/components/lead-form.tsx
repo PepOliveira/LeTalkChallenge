@@ -1,23 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, Search, CircleCheck, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lead } from "@/lib/types";
-import { formatCnpj } from "@/lib/cnpj";
+import { formatCnpj, maskPhone } from "@/lib/cnpj";
 import { cn } from "@/lib/utils";
 
 interface LeadFormProps {
   onSubmit: (lead: Lead) => void;
   isLoading: boolean;
+  initialValues?: Lead;
 }
 
 interface FormErrors {
   nome?: string;
   email?: string;
   telefone?: string;
+  cargo?: string;
   cnpj?: string;
 }
 
@@ -54,20 +56,25 @@ function FieldWrapper({
   );
 }
 
-export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
-  const [form, setForm] = useState<Lead>({
-    nome: "",
-    email: "",
-    telefone: "",
-    cnpj: "",
-  });
+export function LeadForm({ onSubmit, isLoading, initialValues }: LeadFormProps) {
+  const [form, setForm] = useState<Lead>(
+    initialValues ?? { nome: "", email: "", telefone: "", cargo: "", cnpj: "" },
+  );
 
   const [errors, setErrors] = useState<FormErrors>({});
+
+  useEffect(() => {
+    if (initialValues) {
+      setForm(initialValues);
+      setErrors({});
+    }
+  }, [initialValues]);
 
   const fieldValid = {
     nome: form.nome.trim().length > 0,
     email: form.email.trim().length > 0 && isValidEmail(form.email),
-    telefone: form.telefone.trim().length > 0,
+    telefone: form.telefone.replace(/\D/g, "").length >= 10,
+    cargo: form.cargo.trim().length > 0,
     cnpj: form.cnpj.replace(/\D/g, "").length === 14,
   };
 
@@ -78,6 +85,12 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
     const formatted = formatCnpj(e.target.value);
     setForm((prev) => ({ ...prev, cnpj: formatted }));
     if (errors.cnpj) setErrors((prev) => ({ ...prev, cnpj: undefined }));
+  }
+
+  function handleTelefoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const masked = maskPhone(e.target.value);
+    setForm((prev) => ({ ...prev, telefone: masked }));
+    if (errors.telefone) setErrors((prev) => ({ ...prev, telefone: undefined }));
   }
 
   function handleChange(field: keyof Lead) {
@@ -95,7 +108,8 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
     } else if (!isValidEmail(form.email)) {
       newErrors.email = "E-mail inválido.";
     }
-    if (!form.telefone.trim()) newErrors.telefone = "Telefone é obrigatório.";
+    if (form.telefone.replace(/\D/g, "").length < 10) newErrors.telefone = "Telefone inválido.";
+    if (!form.cargo.trim()) newErrors.cargo = "Cargo é obrigatório.";
     if (!form.cnpj.trim()) {
       newErrors.cnpj = "CNPJ é obrigatório.";
     } else if (form.cnpj.replace(/\D/g, "").length !== 14) {
@@ -141,12 +155,24 @@ export function LeadForm({ onSubmit, isLoading }: LeadFormProps) {
         <Input
           id="telefone"
           type="tel"
-          placeholder="ex: (11) 99999-0000"
+          placeholder="(11) 99999-0000"
           value={form.telefone}
-          onChange={handleChange("telefone")}
+          onChange={handleTelefoneChange}
           disabled={isLoading}
           aria-invalid={!!errors.telefone}
           className={cn(fieldValid.telefone && !errors.telefone && "border-primary/40")}
+        />
+      </FieldWrapper>
+
+      <FieldWrapper label="Cargo" htmlFor="cargo" error={errors.cargo} valid={fieldValid.cargo}>
+        <Input
+          id="cargo"
+          placeholder="ex: Diretor Comercial"
+          value={form.cargo}
+          onChange={handleChange("cargo")}
+          disabled={isLoading}
+          aria-invalid={!!errors.cargo}
+          className={cn(fieldValid.cargo && !errors.cargo && "border-primary/40")}
         />
       </FieldWrapper>
 

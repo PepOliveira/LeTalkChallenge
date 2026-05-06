@@ -1,15 +1,16 @@
 "use client";
 
-import { Building2, MapPin, Phone, Users, AlertCircle, Tag, Briefcase, Calendar, Scale, TriangleAlert } from "lucide-react";
+import { Building2, MapPin, Phone, Users, AlertCircle, Tag, Briefcase, Calendar, Scale, TriangleAlert, UserCircle } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { EnrichedCompany, SearchStatus } from "@/lib/types";
+import { EnrichedCompany, Lead, SearchStatus } from "@/lib/types";
 import { formatCapital, formatPhone, formatDate } from "@/lib/cnpj";
 import { cn } from "@/lib/utils";
 
 interface CompanyResultProps {
   status: SearchStatus;
   company: EnrichedCompany | null;
+  lead: Lead | null;
   error: string | null;
 }
 
@@ -132,13 +133,31 @@ function LoadingState() {
   );
 }
 
-function CompanyData({ company }: { company: EnrichedCompany }) {
+function LeadSummary({ lead }: { lead: Lead }) {
+  return (
+    <div className="rounded-xl border border-border/50 bg-white/50 p-4 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <UserCircle className="h-4 w-4 text-primary" />
+        <span className="text-xs font-semibold uppercase tracking-wider text-foreground">Lead</span>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <InfoRow label="Nome" value={lead.nome} />
+        <InfoRow label="Cargo" value={lead.cargo} />
+        <InfoRow label="E-mail" value={lead.email} />
+        <InfoRow label="Telefone" value={lead.telefone} />
+      </div>
+    </div>
+  );
+}
+
+function CompanyData({ company, lead }: { company: EnrichedCompany; lead: Lead | null }) {
   const config = statusConfig(company.situacao_cadastral);
   const address = formatAddress(company.endereco);
   const since = formatDate(company.data_inicio_atividade);
 
   return (
     <div className="flex flex-col gap-4">
+      {lead && <LeadSummary lead={lead} />}
       <div className={cn("rounded-xl border p-4 flex flex-col gap-3", config.band)}>
         <div className="flex items-center gap-2">
           <span className={cn("inline-block h-2 w-2 rounded-full", config.dot)} />
@@ -280,7 +299,7 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
   );
 }
 
-export function CompanyResult({ status, company, error }: CompanyResultProps) {
+export function CompanyResult({ status, company, lead, error }: CompanyResultProps) {
   return (
     <div className="glass rounded-2xl shadow-xl shadow-blue-900/8 h-full">
       <CardHeader className="pt-6 pb-4">
@@ -292,7 +311,7 @@ export function CompanyResult({ status, company, error }: CompanyResultProps) {
         {status === "idle" && <EmptyState />}
         {status === "loading" && <LoadingState />}
         {status === "error" && <ErrorState message={error!} />}
-        {status === "success" && company && <CompanyData company={company} />}
+        {status === "success" && company && <CompanyData company={company} lead={lead} />}
       </CardContent>
     </div>
   );
