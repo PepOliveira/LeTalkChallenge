@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, MapPin, Phone, Users, AlertCircle, Tag, Briefcase, Calendar } from "lucide-react";
+import { Building2, MapPin, Phone, Users, AlertCircle, Tag, Briefcase, Calendar, Scale, TriangleAlert } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { EnrichedCompany, SearchStatus } from "@/lib/types";
@@ -161,6 +161,37 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
         </div>
       </div>
 
+      {(company.motivo_situacao || company.situacao_especial) && (
+        <Section icon={TriangleAlert} title="Alertas">
+          <div className="flex flex-col gap-2">
+            {company.motivo_situacao && (
+              <div className="rounded-md bg-amber-50/80 border border-amber-200/60 px-3 py-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600">Motivo da situação</span>
+                <p className="text-sm text-amber-800 mt-0.5">{company.motivo_situacao}</p>
+              </div>
+            )}
+            {company.situacao_especial && (
+              <div className="rounded-md bg-amber-50/80 border border-amber-200/60 px-3 py-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600">Situação especial</span>
+                <p className="text-sm text-amber-800 mt-0.5">{company.situacao_especial}</p>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+
+      <Section icon={Scale} title="Identificação">
+        <div className="grid grid-cols-2 gap-3">
+          <InfoRow label="Tipo de unidade" value={company.tipo_unidade} />
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Natureza jurídica</span>
+            <span className="text-sm font-medium text-foreground leading-snug">
+              {company.natureza_juridica.descricao}
+            </span>
+          </div>
+        </div>
+      </Section>
+
       <Section icon={Tag} title="Segmento">
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-0.5">
@@ -171,6 +202,19 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
             {company.cnae.codigo}
           </span>
         </div>
+        {company.cnaes_secundarios.length > 0 && (
+          <div className="flex flex-col gap-1.5 pt-1 border-t border-border/40">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">CNAEs secundários</span>
+            <div className="flex flex-col gap-1">
+              {company.cnaes_secundarios.map((cnae) => (
+                <div key={cnae.codigo} className="flex items-start justify-between gap-3">
+                  <span className="text-xs text-foreground/80 leading-snug">{cnae.descricao}</span>
+                  <span className="shrink-0 text-[10px] text-muted-foreground font-mono bg-background/70 border rounded px-1.5 py-0.5">{cnae.codigo}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Section>
 
       <Section icon={Briefcase} title="Perfil">
@@ -179,6 +223,21 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
           <InfoRow label="Funcionários" value={company.faixa_funcionarios} />
           <InfoRow label="Capital social" value={formatCapital(company.capital_social)} />
         </div>
+        {company.regime_tributario.length > 0 && (
+          <div className="flex flex-col gap-1.5 pt-1 border-t border-border/40">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Regime tributário</span>
+            <div className="flex flex-wrap gap-1.5">
+              {company.regime_tributario.map((regime) => (
+                <span
+                  key={regime}
+                  className="text-xs font-medium bg-primary/8 text-primary border border-primary/20 rounded-full px-2.5 py-0.5"
+                >
+                  {regime}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </Section>
 
       <Section icon={MapPin} title="Endereço">
@@ -200,8 +259,8 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
         </Section>
       )}
 
-      {company.socios.length > 0 && (
-        <Section icon={Users} title="Quadro societário">
+      <Section icon={Users} title="Quadro societário">
+        {company.socios.length > 0 ? (
           <div className="flex flex-col gap-2">
             {company.socios.map((socio, index) => (
               <div
@@ -213,8 +272,10 @@ function CompanyData({ company }: { company: EnrichedCompany }) {
               </div>
             ))}
           </div>
-        </Section>
-      )}
+        ) : (
+          <p className="text-sm text-muted-foreground">Não possui quadro societário.</p>
+        )}
+      </Section>
     </div>
   );
 }

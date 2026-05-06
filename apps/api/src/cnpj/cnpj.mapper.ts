@@ -107,3 +107,27 @@ export function mapPorteToLabel(porte: string): string {
 export function mapPorteToFaixa(porte: string): string {
   return PORTE_MAP[porte]?.faixa ?? 'Não informado';
 }
+
+export function mapMatrizFilial(identificador: number): string {
+  return identificador === 1 ? 'Matriz' : 'Filial';
+}
+
+export function mapRegimeTributario(
+  regimes: Array<{ codigo: number; descricao: string }> | null,
+): string[] {
+  if (!regimes || regimes.length === 0) return [];
+  return regimes.map((r) => r.descricao).filter(Boolean);
+}
+
+export function mapMotivoSituacao(
+  motivo: number,
+  descricao: string,
+): string | null {
+  if (!motivo || descricao?.toUpperCase() === 'SEM MOTIVO') return null;
+  return descricao || null;
+}
+
+export function mapSituacaoEspecial(situacao: string | null): string | null {
+  if (!situacao || situacao.trim() === '') return null;
+  return situacao;
+}

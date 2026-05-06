@@ -3,7 +3,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import axios from 'axios';
 import { BrasilApiCnpjResponse, EnrichedCompany, LeadResponse, CreateLeadDto } from './cnpj.types';
-import { mapCnaeToSegment, mapPorteToFaixa, mapPorteToLabel } from './cnpj.mapper';
+import { mapCnaeToSegment, mapMatrizFilial, mapMotivoSituacao, mapPorteToFaixa, mapPorteToLabel, mapRegimeTributario, mapSituacaoEspecial } from './cnpj.mapper';
 
 @Injectable()
 export class CnpjService {
@@ -40,14 +40,26 @@ export class CnpjService {
       razao_social: data.razao_social,
       nome_fantasia: data.nome_fantasia || data.razao_social,
       situacao_cadastral: data.descricao_situacao_cadastral,
+      motivo_situacao: mapMotivoSituacao(data.motivo_situacao_cadastral, data.descricao_motivo_situacao_cadastral),
+      situacao_especial: mapSituacaoEspecial(data.situacao_especial),
       data_inicio_atividade: data.data_inicio_atividade || '',
+      tipo_unidade: mapMatrizFilial(data.identificador_matriz_filial),
+      natureza_juridica: {
+        codigo: data.codigo_natureza_juridica,
+        descricao: data.natureza_juridica,
+      },
       segmento: mapCnaeToSegment(data.cnae_fiscal),
       cnae: {
         codigo: data.cnae_fiscal,
         descricao: data.cnae_fiscal_descricao,
       },
+      cnaes_secundarios: (data.cnaes_secundarios || []).map((c) => ({
+        codigo: c.codigo,
+        descricao: c.descricao,
+      })),
       porte: mapPorteToLabel(data.porte),
       faixa_funcionarios: mapPorteToFaixa(data.porte),
+      regime_tributario: mapRegimeTributario(data.regime_tributario),
       capital_social: data.capital_social,
       endereco: {
         logradouro: data.logradouro || '',
